@@ -1,392 +1,597 @@
---[[
-]]--
-
----- Variables ----
-kVars = {}
-kVars.WindowName = "Tapping Simulator Hub | Omega Hub | .gg/xFJEaarbYZ"
-kVars.txtName = kVars.WindowName .. ".txt"
-kVars.lp = game:GetService('Players').LocalPlayer
-kVars.rs = game:GetService('ReplicatedStorage')
-kVars.vu = game:GetService('VirtualUser')
-kVars.HttpService = game:GetService("HttpService")
-kVars.themes = {}
-kVars.tmp = {}
----- Load Settings ----
-if readfile and isfile and isfile(kVars.txtName) then
-    kVars.tmp = kVars.HttpService:JSONDecode(readfile(kVars.txtName))
-    for i,v in pairs(kVars.tmp) do
-        kVars.themes[i] = Color3.fromRGB(v[1], v[2], v[3])
-    end
-else
-    print("Loading defult theme")
-    kVars.themes = {
-        Background = Color3.fromRGB(24, 24, 24),
-        Glow = Color3.fromRGB(0, 0, 0),
-        Accent = Color3.fromRGB(10, 10, 10),
-        LightContrast = Color3.fromRGB(20, 20, 20),
-        DarkContrast = Color3.fromRGB(14, 14, 14),  
-        TextColor = Color3.fromRGB(255, 255, 255)
-   }
-end
-
----- Save Settings ----
-function saveSettings()
-    if writefile then
-        kVars.themes = {}
-        for i,v in pairs(game:GetService('CoreGui')[kVars.WindowName]:GetChildren()) do
-            if v.Name == "ColorPicker" then
-                kVars.themes[v.Title.Text] = {v.Container.Inputs.R.Textbox.text, v.Container.Inputs.G.Textbox.text, v.Container.Inputs.B.Textbox.text}
-            end
-        end
-        writefile(kVars.txtName, kVars.HttpService:JSONEncode(kVars.themes))
-    else
-        print("You injector does not support writefile.")
-    end
-end
-
----- Destroy multiple instances ----
-if game:GetService('CoreGui'):FindFirstChild(kVars.WindowName) then
-   game:GetService('CoreGui'):FindFirstChild(kVars.WindowName):Destroy()
-   wait(.2)
-end
-
----- antiAFK ----
-kVars.AntiAfk = game:GetService('Players').LocalPlayer.Idled:connect(function()
-   kVars.vu:CaptureController()
-   kVars.vu:ClickButton2(Vector2.new())
-end)
-
----- Load window ----
-local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/zxciaz/VenyxUI/main/Reuploaded"))()
-local Window = library.new(kVars.WindowName, 5013109572)
-
----- pages and sections ----
-local pageFarm = Window:addPage("Farm", 3117485989)
-local sectionAutoFarm = pageFarm:addSection("Auto Farm")
-local sectionRebirth = pageFarm:addSection("Rebirth")
-local sectionBuy = pageFarm:addSection("Buy")
-
-local pageEggs = Window:addPage("Eggs", 9194077649)
-local sectionEggs = pageEggs:addSection("Auto Open")
-
-local pageTeleport = Window:addPage("Teleport", 4814045731)
-local sectionLocations = pageTeleport:addSection("Locations")
-
-local pagePlayer = Window:addPage("Player", 5012544693)
-local sectionPlayerStats = pagePlayer:addSection("Stats")
-local sectionTpToPlayer = pagePlayer:addSection("Teleport To Player")
-
-local pageSettings = Window:addPage("Settings", 6942070576)
-local sectionTheme = pageSettings:addSection("Theme")
-local sectionKeybinds = pageSettings:addSection("Keybinds")
-
-----  ----
-sectionAutoFarm:addToggle("Tap", false, function(bool)
-    kVars.boolTap = bool
-    if bool then fTap() end
-end)
-
-function fTap()
-    spawn(function()
-        while kVars.boolTap do
-            wait()
-            game:GetService("ReplicatedStorage").Events.Tap:FireServer("Main")
-        end
-    end)
-end
-
-local RebirthBtnData = require(game:GetService("ReplicatedStorage").Data.RebirthButtonData)
-
-local rebirthList =  {"1","5","10","20","100","500","2000","4500","32000"}
-kVars.selectedRebirth = nil
-sectionRebirth:addDropdown("Rebirth Amount", rebirthList, function(txt)
-    kVars.selectedRebirth = txt
-end)
-
-sectionRebirth:addToggle("Rebirth", false, function(bool)
-    kVars.boolRebirth = bool
-    if bool then fRebirth() end
-end)
-
-function fRebirth()
-    spawn(function()
-        while kVars.boolRebirth do
-            wait()
-            if kVars.selectedRebirth ~= nil and kVars.selectedRebirth ~= "Rebirth Amount" then
-                game:GetService("ReplicatedStorage").Events.Rebirth:FireServer(kVars.selectedRebirth)
-            end
-        end
-    end)
-end
-
----- upgrades section ----
-sectionBuy:addToggle("Rebirth Buttons Upgrade", false, function(bool)
-    kVars.boolRebirthUpgrades = bool
-    if bool then fRebirthUpgrades() end
-end)
-
-function fRebirthUpgrades()
-    spawn(function()
-        while kVars.boolRebirthUpgrades do
-            wait()
-            game:GetService("ReplicatedStorage").Events.Upgrade:FireServer("rebirthUpgrades")
-        end
-    end)
-end
-
-sectionBuy:addToggle("Jumps Upgrade", false, function(bool)
-    kVars.boolJumpsUpgrade = bool
-    if bool then fJumpsUpgrade() end
-end)
-
-function fJumpsUpgrade()
-    spawn(function()
-        while kVars.boolJumpsUpgrade do
-            wait()
-            game:GetService("ReplicatedStorage").Events.Upgrade:FireServer("jumpsUpgrade")
-        end
-    end)
-end
+-- No One Asked But Who Cared wait shit all caps tf
 
 
-sectionBuy:addToggle("Gems Upgrade", false, function(bool)
-    kVars.boolGemUpgrade = bool
-    if bool then fGemUpgrade() end
-end)
-
-function fGemUpgrade()
-    spawn(function()
-        while kVars.boolGemUpgrade do
-            wait()
-            game:GetService("ReplicatedStorage").Events.Upgrade:FireServer("gemMultiplierUpgrade")
-        end
-    end)
-end
-
-sectionBuy:addToggle("Storage Upgrade", false, function(bool)
-    kVars.boolStorageUpgrade = bool
-    if bool then fStorageUpgrade() end
-end)
-
-function fStorageUpgrade()
-    spawn(function()
-        while kVars.boolStorageUpgrade do
-            wait()
-            game:GetService("ReplicatedStorage").Events.Upgrade:FireServer("storageUpgrade")
-        end
-    end)
-end
-
----- open eggs ----
-kVars.eggsList = {
-    [1] = {name = "Starter", price = "200"},
-    [2] = {name = "Wood Egg", price = "2500"},
-    [3] = {name = "Jungle Egg", price = "150K"},
-    [4] = {name = "Forest Egg", price = "1.5M"},
-    [5] = {name = "Bee Egg", price = "5M"},
-    [6] = {name = "Swamp Egg", price = "80M"},
-    [7] = {name = "Snow Egg", price = "800M"},
-    [8] = {name = "Desert Egg", price = "300B"},
-    [9] = {name = "Death Egg", price = "2T"},
-    [10] = {name = "Beach Egg", price = "15T"},
-    [11] = {name = "2M Egg", price = "600T"},
-    [12] = {name = "Mine Egg", price = "2Qa"},
-    [13] = {name = "Cloud Egg", price = "25Qa"},
-    [14] = {name = "Dominus Egg", price = "800T"}
+local Config = {
+    WindowName = "V.G Hub",
+    Color = Color3.fromRGB(255, 128, 64),
+    Keybind = Enum.KeyCode.RightControl
 }
-kVars.eggPriceList = {}
-for i,v in ipairs(kVars.eggsList) do
-    table.insert(kVars.eggPriceList, v.price)
+repeat
+    wait()
+until game:IsLoaded()
+
+local Players = game:GetService("Players")
+local Player = Players.LocalPlayer
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local HttpService = game:GetService("HttpService")
+local TweenService = game:GetService("TweenService")
+local Workspace = game:GetService("Workspace")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local wait = task.wait
+local Eggs = {}
+for i,v in pairs(Workspace.Shops:GetChildren()) do
+    if v:IsA("Model") and not v.Name:find("Robux") and not table.find(Eggs,v.Name) then
+        table.insert(Eggs,v.Name)
+    end 
+end 
+local Islands = {}
+for i,v in pairs(Workspace.Islands:GetChildren()) do
+    if v:IsA("Model") and not table.find(Islands,v.Name) then
+        table.insert(Islands,v.Name)
+    end 
+end 
+
+local TeleportIsland = nil 
+
+local Name = "Tapping Simulator!.json"
+
+Des = {}
+if makefolder then
+    makefolder("V.G Hub")
 end
 
-kVars.selectedEgg = "Starter"
+local Settings
 
-sectionEggs:addDropdown("Select Egg to Open", kVars.eggPriceList,function(value)
-    kVars.selectedEgg = value
+if
+    not pcall(
+        function()
+            readfile("V.G Hub//" .. Name)
+        end
+    )
+ then
+    writefile("V.G Hub//" .. Name, HttpService:JSONEncode(Des))
+end
+if readfile("V.G Hub//" .. Name) then
+    Settings = HttpService:JSONDecode(readfile("V.G Hub//" .. Name))
+end
+local function Save()
+    writefile("V.G Hub//" .. Name, HttpService:JSONEncode(Settings))
+end
+
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/1201for/V.G-Hub/main/test"))()
+local Window = Library:CreateWindow(Config, game:GetService("CoreGui"))
+
+local Tab1 = Window:CreateTab("Project Slayers")
+local Tab2 = Window:CreateTab("UI Settings")
+
+local Section1 = Tab1:CreateSection("")
+local Section2 = Tab1:CreateSection("")
+local Section3 = Tab2:CreateSection("Menu")
+local Section4 = Tab2:CreateSection("Background")
+
+local Toggle1 = Section1:CreateToggle("Auto Click", Settings.AutoClick, function(State)
+Settings.AutoClick = State
+spawn(function()
+    while wait() and Settings.AutoClick do 
+        game:GetService("ReplicatedStorage").Events.Tap:FireServer()
+    end 
+end)
 end)
 
-sectionEggs:addToggle("Open 3", false, function(bool)
-    kVars.boolOpen3 = bool
+local Toggle1 = Section1:CreateToggle("Auto Egg", Settings.AutoEgg, function(State)
+Settings.AutoEgg = State
+spawn(function()
+    while wait() and Settings.AutoEgg do 
+        game:GetService("ReplicatedStorage").Events.HatchEgg:InvokeServer({},Settings.Egg,0)
+    end
+end)
 end)
 
-sectionEggs:addToggle("Open Egg", false, function(bool)
-    kVars.boolOpenEgg = bool
-    if bool then fOpenEgg() end
+local Dropdown3 = Section1:CreateDropdown("Eggs", Eggs, function(Name)
+    Settings.Egg = Name
 end)
 
-function fOpenEgg()
-    spawn(function()
-        while kVars.boolOpenEgg do
-            wait()
-            for i,v in pairs(kVars.eggsList) do
-                if v.price == kVars.selectedEgg then
-                    if kVars.boolOpen3 then
-                        game:GetService("ReplicatedStorage").Events.HatchEgg:InvokeServer({},v.name,3)
-                    else
-                        game:GetService("ReplicatedStorage").Events.HatchEgg:InvokeServer({},v.name,1)
+local Dropdown3 = Section1:CreateDropdown("Teleport To Island", Islands, function(Name)
+    Player.Character.HumanoidRootPart.CFrame = game:GetService("Workspace").Islands[Name].Path:GetModelCFrame() 
+end)
+
+
+local Toggle1 = Section2:CreateToggle("Enable WalkSpeed/JumpPower", Settings.Go, function(State)
+Settings.Go = State
+RunService.Stepped:connect(
+    function()
+        if Settings.Go then
+            Player.Character:WaitForChild("Humanoid").WalkSpeed = Settings.WalkSpeed
+            Player.Character:WaitForChild("Humanoid").JumpPower = Settings.JumpPower
+            if not UserInputService.WindowFocusReleased then
+                setfpscap(Settings.Fps)
+            end
+        end
+    end
+)
+
+end)
+
+local TextBox1 = Section2:CreateTextBox("Fps Cap", "Only numbers", true, function(Value)
+    Settings.Fps = Value
+end)
+
+local TextBox1 = Section2:CreateTextBox("WalkSpeed", "Only numbers", true, function(Value)
+    Settings.WalkSpeed = Value
+end)
+local TextBox1 = Section2:CreateTextBox("JumpPower", "Only numbers", true, function(Value)
+    Settings.JumpPower = Value
+end)
+
+local TextBox1 = Section2:CreateTextBox("Seconds Until ServerHop", "Only numbers", true, function(Value)
+    Settings.Seconds = Value
+end)
+
+
+
+local Toggle1 = Section2:CreateToggle("Infinite Jump", Settings.InfiniteJump, function(State)
+Settings.InfiniteJump = State
+UserInputService.JumpRequest:connect(
+    function()
+        if Settings.InfiniteJump then
+            game:GetService "Players".LocalPlayer.Character:FindFirstChildOfClass "Humanoid":ChangeState("Jumping")
+        end
+    end
+)
+end)
+
+local ESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/1201for/V.G-Hub/main/Karrot-Esp"))()
+local Toggle1 = Section1:CreateToggle("Enable Esp", Settings.Esp, function(State)
+    Settings.Esp = State
+    ESP:Toggle(Settings.Esp)
+end)
+local Toggle1 = Section1:CreateToggle("PLayer Esp", Settings.PlayerEsp, function(State)
+    Settings.PlayerEsp = State
+    ESP.Players = Settings.PlayerEsp
+end)
+local Toggle1 = Section1:CreateToggle("Tracers Esp", Settings.Tracers, function(State)
+    Settings.Tracers = State
+    ESP.Tracers = Settings.Tracers
+end)
+local Toggle1 = Section1:CreateToggle("Name Esp", Settings.EspNames, function(State)
+    ESP.Names = Settings.EspNames
+    Settings.EspNames = State
+end)
+local Toggle1 = Section1:CreateToggle("Boxes Esp", Settings.Boxes, function(State)
+    Settings.Boxes = State
+    ESP.Boxes = Settings.Boxes
+end)
+
+local Toggle1 = Section2:CreateToggle("Invisicam", Settings.Sorry, function(State)
+Settings.Sorry = State
+if Settings.Sorry then
+    Player.DevCameraOcclusionMode = "Invisicam"
+else
+    Player.DevCameraOcclusionMode = "Zoom"
+end
+end)
+
+
+local Toggle1 = Section2:CreateToggle("N Noclip", Settings.Sex1, function(State)
+noclips = false
+Settings.Sex1 = State
+Player:GetMouse().KeyDown:connect(
+    function(v)
+        if v == "n" then
+            if Settings.Sex1 then
+                noclips = not noclips
+                for i, v in pairs(Player.Character:GetChildren()) do
+                    if v:IsA("BasePart") then
+                        v.CanCollide = false
                     end
                 end
             end
         end
-    end)
-end
-
----- teleport ----
-kVars.teleportLocations = {
-    [1] = {name = "Spawn", cf = CFrame.new(-193.519, 63.174, -461.695)},
-    [2] = {name = "Forest Island", cf = CFrame.new(-165, 979, -440)},
-    [3] = {name = "Flower Island", cf = CFrame.new(-179, 1517, -647)},
-    [4] = {name = "Swamp Island", cf = CFrame.new(-263, 2116, -656)},
-    [5] = {name = "Snow Island", cf = CFrame.new(-241, 2937, -470)},
-    [6] = {name = "Desert Island", cf = CFrame.new(-203, 4228, -780)},
-    [7] = {name = "Death Island", cf = CFrame.new(-319, 5418, -480)},
-    [8] = {name = "Beach Island", cf = CFrame.new(-183, 6875, -495)},
-    [9] = {name = "Mine Island", cf = CFrame.new(-281, 8368, -484)},
-    [10] = {name = "Cloud Island", cf = CFrame.new(-335, 11238, -238)},
-    [11] = {name = "Dominus Island", cf = CFrame.new(699, 125, 2161)}
-}
-
-
-for i,v in ipairs(kVars.teleportLocations) do
-    sectionLocations:addButton(v.name,function()
-        kVars.lp.Character.HumanoidRootPart.CFrame = v.cf
-    end)
-end
-
-
----- player stats section ----
-sectionPlayerStats:addSlider("Walk Speed", 16, kVars.lp.Character:WaitForChild('Humanoid').WalkSpeed, 1024, function(value)
-    kVars.lp.Character:WaitForChild('Humanoid').WalkSpeed = value
-end)
-
-sectionPlayerStats:addSlider("Jump Power", 50, kVars.lp.Character:WaitForChild('Humanoid').JumpPower, 1024, function(value)
-    kVars.lp.Character:WaitForChild('Humanoid').JumpPower = value
-end)
-
-sectionPlayerStats:addToggle("Inf Jump", false, function(bool)
-    kVars.boolInfJump = bool
-end)
-
-kVars.InfJumpConnect = game:GetService("UserInputService").JumpRequest:connect(function()
-	if kVars.boolInfJump and kVars.lp.Character:FindFirstChild("Humanoid") then
-		kVars.lp.Character:FindFirstChildOfClass('Humanoid'):ChangeState("Jumping")
-	end
-end)
-
----- tp to player section ----
-sectionTpToPlayer:addTextbox("PlayerName", "Name", function(value, focusLost)
-    if focusLost then
-        kVars.teleportToPlayer = value
-        print(value)
     end
-end)
-
-sectionTpToPlayer:addButton("Teleport", function()
-    local cnf = true
-    if game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart") and kVars.teleportToPlayer ~= nil then
-        for i,v in pairs(game:GetService("Players"):GetChildren()) do
-            local hrp = game:GetService('Players').LocalPlayer.Character:WaitForChild('HumanoidRootPart')
-            if string.find(string.lower(v.DisplayName), string.lower(kVars.teleportToPlayer)) then
-                hrp.CFrame = v.Character.HumanoidRootPart.CFrame
-                cnf = false
-            elseif string.find(string.lower(v.Name), string.lower(kVars.teleportToPlayer)) then
-                hrp.CFrame = v.Character.HumanoidRootPart.CFrame
-                cnf = false
+)
+RunService.Stepped:connect(
+    function()
+        if noclips then
+            for i, v in pairs(Player.Character:GetChildren()) do
+                if v:IsA("BasePart") then
+                    v.CanCollide = false
+                end
             end
         end
-        if cnf == true then
-            Window:Notify("Error", "Could not find player.")
-        end
-    else
-        Window:Notify("Error", "You didn't put a valid playername in the textbox.")
     end
+)
+
 end)
 
----- Theme ----
-for theme, color in pairs(kVars.themes) do
-    sectionTheme:addColorPicker(theme, color, function(color3)
-        Window:setTheme(theme, color3)
-    end)
-    Window:setTheme(theme, color)
+local Toggle1 = Section2:CreateToggle("G Noclip", Settings.Sex, function(State)
+Settings.Sex = State
+noclip = false
+RunService.Stepped:connect(
+    function()
+        if noclip then
+            Player.Character.Humanoid:ChangeState(11)
+        end
+    end
+)
+mouse = Player:GetMouse()
+Player:GetMouse().KeyDown:connect(
+    function(v)
+        if v == "g" then
+            if Settings.Sex then
+                noclip = not noclip
+                Player.Character.Humanoid:ChangeState(11)
+            end
+        end
+    end
+)
+end)
+local Toggle1 = Section2:CreateToggle("H Fly", Settings.Sex2, function(State)
+Settings.Sex2 = State
+local Max = 0
+local Players = game.Players
+local LP = Players.LocalPlayer
+local Mouse = LP:GetMouse()
+Mouse.KeyDown:connect(
+    function(k)
+        if k:lower() == "h" then
+            Max = Max + 1
+            getgenv().Fly = false
+            if Settings.Sex2 then
+                local T =  LP.Character:FindFirstChildWhichIsA("Humanoid").RigType == Enum.HumanoidRigType.R6 and LP.Character:FindFirstChild("HumanoidRootPart") or LP.Character:FindFirstChildWhichIsA("Humanoid").RigType == Enum.HumanoidRigType.R15 and LP.Character:FindFirstChild("UpperTorso")
+                local S = {
+                    F = 0,
+                    B = 0,
+                    L = 0,
+                    R = 0
+                }
+                local S2 = {
+                    F = 0,
+                    B = 0,
+                    L = 0,
+                    R = 0
+                }
+                local SPEED = 5
+                local function FLY()
+                    getgenv().Fly = true
+                    local BodyGyro = Instance.new("BodyGyro", T)
+                    local BodyVelocity = Instance.new("BodyVelocity", T)
+                    BodyGyro.P = 9e4
+                    BodyGyro.maxTorque = Vector3.new(9e9, 9e9, 9e9)
+                    BodyGyro.cframe = T.CFrame
+                    BodyVelocity.velocity = Vector3.new(0, 0.1, 0)
+                    BodyVelocity.maxForce = Vector3.new(9e9, 9e9, 9e9)
+                    spawn(
+                        function()
+                            repeat
+                                wait()
+                                LP.Character.Humanoid.PlatformStand = true
+                                if S.L + S.R ~= 0 or S.F + S.B ~= 0 then
+                                    SPEED = 200
+                                elseif not (S.L + S.R ~= 0 or S.F + S.B ~= 0) and SPEED ~= 0 then
+                                    SPEED = 0
+                                end
+                                if (S.L + S.R) ~= 0 or (S.F + S.B) ~= 0 then
+                                    BodyVelocity.velocity =
+                                        ((game.Workspace.CurrentCamera.CoordinateFrame.lookVector * (S.F + S.B)) +
+                                        ((game.Workspace.CurrentCamera.CoordinateFrame *
+                                            CFrame.new(S.L + S.R, (S.F + S.B) * 0.2, 0).p) -
+                                            game.Workspace.CurrentCamera.CoordinateFrame.p)) *
+                                        SPEED
+                                    S2 = {
+                                        F = S.F,
+                                        B = S.B,
+                                        L = S.L,
+                                        R = S.R
+                                    }
+                                elseif (S.L + S.R) == 0 and (S.F + S.B) == 0 and SPEED ~= 0 then
+                                    BodyVelocity.velocity =
+                                        ((game.Workspace.CurrentCamera.CoordinateFrame.lookVector * (S2.F + S2.B)) +
+                                        ((game.Workspace.CurrentCamera.CoordinateFrame *
+                                            CFrame.new(S2.L + S2.R, (S2.F + S2.B) * 0.2, 0).p) -
+                                            game.Workspace.CurrentCamera.CoordinateFrame.p)) *
+                                        SPEED
+                                else
+                                    BodyVelocity.velocity = Vector3.new(0, 0.1, 0)
+                                end
+                                BodyGyro.cframe = game.Workspace.CurrentCamera.CoordinateFrame
+                            until not getgenv().Fly
+                            S = {
+                                F = 0,
+                                B = 0,
+                                L = 0,
+                                R = 0
+                            }
+                            S2 = {
+                                F = 0,
+                                B = 0,
+                                L = 0,
+                                R = 0
+                            }
+                            SPEED = 0
+                            BodyGyro:destroy()
+                            BodyVelocity:destroy()
+                            LP.Character.Humanoid.PlatformStand = false
+                        end
+                    )
+                end
+                Mouse.KeyDown:connect(
+                    function(k)
+                        if k:lower() == "w" then
+                            S.F = 1
+                        elseif k:lower() == "s" then
+                            S.B = -1
+                        elseif k:lower() == "a" then
+                            S.L = -1
+                        elseif k:lower() == "d" then
+                            S.R = 1
+                        end
+                    end
+                )
+                Mouse.KeyUp:connect(
+                    function(k)
+                        if k:lower() == "w" then
+                            S.F = 0
+                        elseif k:lower() == "s" then
+                            S.B = 0
+                        elseif k:lower() == "a" then
+                            S.L = 0
+                        elseif k:lower() == "d" then
+                            S.R = 0
+                        end
+                    end
+                )
+                FLY()
+                if Max == 2 then
+                    getgenv().Fly = false
+                    Max = 0
+                end
+            end
+        end
+    end
+)
+end)
+local Toggle1 = Section2:CreateToggle("AutoServerHop", Settings.ServerHop, function(State)
+Settings.ServerHop = State
+spawn(function()
+while Settings.ServerHop do wait(Settings.Seconds)
+local PlaceID = game.PlaceId
+local AllIDs = {}
+local foundAnything = ""
+local actualHour = os.date("!*t").hour
+local Deleted = false
+local File = pcall(function()
+    AllIDs = HttpService:JSONDecode(readfile("NotSameServers.json"))
+end)
+if not File then
+    table.insert(AllIDs, actualHour)
+    writefile("NotSameServers.json", HttpService:JSONEncode(AllIDs))
+end
+function TPReturner()
+    local Site;
+    if foundAnything == "" then
+        Site = game.HttpService:JSONDecode(game:HttpGet('https://games.roblox.com/v1/games/' .. PlaceID .. '/servers/Public?sortOrder=Asc&limit=100'))
+    else
+        Site = game.HttpService:JSONDecode(game:HttpGet('https://games.roblox.com/v1/games/' .. PlaceID .. '/servers/Public?sortOrder=Asc&limit=100&cursor=' .. foundAnything))
+    end
+    local ID = ""
+    if Site.nextPageCursor and Site.nextPageCursor ~= "null" and Site.nextPageCursor ~= nil then
+        foundAnything = Site.nextPageCursor
+    end
+    local num = 0;
+    for i,v in pairs(Site.data) do
+        local Possible = true
+        ID = tostring(v.id)
+        if tonumber(v.maxPlayers) > tonumber(v.playing) then
+            for _,Existing in pairs(AllIDs) do
+                if num ~= 0 then
+                    if ID == tostring(Existing) then
+                        Possible = false
+                    end
+                else
+                    if tonumber(actualHour) ~= tonumber(Existing) then
+                        local delFile = pcall(function()
+                            delfile("NotSameServers.json")
+                            AllIDs = {}
+                            table.insert(AllIDs, actualHour)
+                        end)
+                    end
+                end
+                num = num + 1
+            end
+            if Possible == true then
+                table.insert(AllIDs, ID)
+                wait()
+                pcall(function()
+                    writefile("NotSameServers.json", HttpService:JSONEncode(AllIDs))
+                    wait()
+                    game:GetService("TeleportService"):TeleportToPlaceInstance(PlaceID, ID, Player)
+                end)
+                wait(4)
+            end
+        end
+    end
 end
 
-sectionTheme:addButton("Save Theme", function()
-    saveSettings()
+function Tween()
+    while wait() do
+        pcall(function()
+            TPReturner()
+            if foundAnything ~= "" then
+                TPReturner()
+            end
+        end)
+    end
+end
+
+-- If you'd like to use a script before server hopping (Like a Automatic Chest collector you can put the Tween() after it collected everything.
+Tween() 
+end 
+end)
+end)
+local Button1 = Section2:CreateButton("Anti Lag", function()
+for _, v in pairs(Workspace:GetDescendants()) do
+    if v:IsA("BasePart") and not v.Parent:FindFirstChild("Humanoid") then
+        v.Material = Enum.Material.SmoothPlastic
+        if v:IsA("Texture") then
+            v:Destroy()
+        end
+    end
+end
 end)
 
-sectionKeybinds:addKeybind("Open/Close Menu", Enum.KeyCode.Backquote, function()
-	Window:toggle()
-end, function()
+local Button1 = Section2:CreateButton("Teleport to RandomPlayer", function()
+local randomPlayer = game.Players:GetPlayers()[math.random(1, #game.Players:GetPlayers())]
+
+Player.Character.HumanoidRootPart.CFrame =
+    CFrame.new(
+    Vector3.new(
+        randomPlayer.Character.Head.Position.X,
+        randomPlayer.Character.Head.Position.Y,
+        randomPlayer.Character.Head.Position.Z
+    )
+)
 end)
+local Button1 = Section2:CreateButton("Lag Switch F3", function()
+local ass = false
+local bitch = settings()
 
----- Select main page to display ----
-Window:SelectPage(Window.pages[1], true)
+game:service "UserInputService".InputEnded:connect(
+    function(i)
+        if i.KeyCode == Enum.KeyCode.F3 then
+            ass = not ass
+            bitch.Network.IncomingReplicationLag = ass and 10 or 0
+        end
+    end
+)
+end) 
 
----- Closing ----
-kVars.ClosingConnect = game:GetService("CoreGui").ChildRemoved:Connect(function(child)
-	if child.Name == kVars.WindowName then
-	    kVars.InfJumpConnect:Disconnect()
-        kVars.AntiAfk:Disconnect()
-		for i,v in pairs(kVars) do
-			if type(v) == "boolean" then
-				v = false
-			end
-		end
-        wait(.1)
-		kVars.ClosingConnect:Disconnect()
-		script:Destroy()
+local Button1 = Section2:CreateButton("ServerHop", function()
+local PlaceID = game.PlaceId
+local AllIDs = {}
+local foundAnything = ""
+local actualHour = os.date("!*t").hour
+local Deleted = false
+local File = pcall(function()
+    AllIDs = HttpService:JSONDecode(readfile("NotSameServers.json"))
+end)
+if not File then
+    table.insert(AllIDs, actualHour)
+    writefile("NotSameServers.json", HttpService:JSONEncode(AllIDs))
+end
+function TPReturner()
+    local Site;
+    if foundAnything == "" then
+        Site = game.HttpService:JSONDecode(game:HttpGet('https://games.roblox.com/v1/games/' .. PlaceID .. '/servers/Public?sortOrder=Asc&limit=100'))
+    else
+        Site = game.HttpService:JSONDecode(game:HttpGet('https://games.roblox.com/v1/games/' .. PlaceID .. '/servers/Public?sortOrder=Asc&limit=100&cursor=' .. foundAnything))
+    end
+    local ID = ""
+    if Site.nextPageCursor and Site.nextPageCursor ~= "null" and Site.nextPageCursor ~= nil then
+        foundAnything = Site.nextPageCursor
+    end
+    local num = 0;
+    for i,v in pairs(Site.data) do
+        local Possible = true
+        ID = tostring(v.id)
+        if tonumber(v.maxPlayers) > tonumber(v.playing) then
+            for _,Existing in pairs(AllIDs) do
+                if num ~= 0 then
+                    if ID == tostring(Existing) then
+                        Possible = false
+                    end
+                else
+                    if tonumber(actualHour) ~= tonumber(Existing) then
+                        local delFile = pcall(function()
+                            delfile("NotSameServers.json")
+                            AllIDs = {}
+                            table.insert(AllIDs, actualHour)
+                        end)
+                    end
+                end
+                num = num + 1
+            end
+            if Possible == true then
+                table.insert(AllIDs, ID)
+                wait()
+                pcall(function()
+                    writefile("NotSameServers.json", HttpService:JSONEncode(AllIDs))
+                    wait()
+                    game:GetService("TeleportService"):TeleportToPlaceInstance(PlaceID, ID, Player)
+                end)
+                wait(4)
+            end
+        end
+    end
+end
+
+function Tween()
+    while wait() do
+        pcall(function()
+            TPReturner()
+            if foundAnything ~= "" then
+                TPReturner()
+            end
+        end)
+    end
+end
+
+-- If you'd like to use a script before server hopping (Like a Automatic Chest collector you can put the Tween() after it collected everything.
+Tween() 
+end)
+local Button1 = Section2:CreateButton("Rejoin", function()
+game:GetService("TeleportService"):Teleport(game.PlaceId, Player) end)
+
+
+local Button1 = Section2:CreateButton("Save Settings", function()
+Save()
+end)
+local Toggle3 = Section3:CreateToggle("UI Toggle", nil, function(State)
+	Window:Toggle(State)
+end)
+Toggle3:CreateKeybind(tostring(Config.Keybind):gsub("Enum.KeyCode.", ""), function(Key)
+	Config.Keybind = Enum.KeyCode[Key]
+end)
+Toggle3:SetState(true)
+Section3:CreateLabel("Credits DekuDimz#7960")
+Section3:CreateLabel("Credits AlexR32#3232 Ui")
+Section3:CreateLabel("Credits brush#7337")
+local Colorpicker3 = Section3:CreateColorpicker("UI Color", function(Color)
+	Window:ChangeColor(Color)
+end)
+Colorpicker3:UpdateColor(Config.Color)
+
+-- credits to jan for patterns
+local Dropdown3 = Section4:CreateDropdown("Image", {"Default","Hearts","Abstract","Hexagon","Circles","Lace With Flowers","Floral"}, function(Name)
+	if Name == "Default" then
+		Window:SetBackground("2151741365")
+	elseif Name == "Hearts" then
+		Window:SetBackground("6073763717")
+	elseif Name == "Abstract" then
+		Window:SetBackground("6073743871")
+	elseif Name == "Hexagon" then
+		Window:SetBackground("6073628839")
+	elseif Name == "Circles" then
+		Window:SetBackground("6071579801")
+	elseif Name == "Lace With Flowers" then
+		Window:SetBackground("6071575925")
+	elseif Name == "Floral" then
+		Window:SetBackground("5553946656")
 	end
 end)
+Dropdown3:SetOption("Default")
 
---syn.protect_gui(game:GetService("CoreGui")[kVars.WindowName])
-
-
-
---[[
-section1:addToggle("Title", false, function(bool)
-   kVars.bool = bool
-   if bool then function() end
+local Colorpicker4 = Section4:CreateColorpicker("Color", function(Color)
+	Window:SetBackgroundColor(Color)
 end)
-section1:addButton("Title", function()
-   print("Clicked")
-end)
-section1:addTextbox("Notification", "Default", function(value, focusLost)
-   print("Input", value)
+Colorpicker4:UpdateColor(Color3.new(1,1,1))
 
-   if focusLost then
-      Window:Notify("Title", value)
-   end
+local Slider3 = Section4:CreateSlider("Transparency",0,1,nil,false, function(Value)
+	Window:SetBackgroundTransparency(Value)
 end)
+Slider3:SetValue(0)
 
-section2:addKeybind("Toggle Keybind", Enum.KeyCode.One, function()
-   print("Activated Keybind")
-   Window:toggle()
-end, function()
-   print("Changed Keybind")
+local Slider4 = Section4:CreateSlider("Tile Scale",0,1,nil,false, function(Value)
+	Window:SetTileScale(Value)
 end)
-section2:addColorPicker("ColorPicker", Color3.fromRGB(50, 50, 50))
-section2:addColorPicker("ColorPicker2")
-section2:addSlider("Slider", min, current, max, function(value)
-   print("Dragged", value)
-end)
-kVars.list1 = {"Hello", "World", "Hello World", "Word", 1, 2, 3}
-section2:addDropdown("Dropdown", kVars.list1, function(txt)
-   print(txt)
-end)
-section2:addButton("Button", function()
-   kVars.list1 = {"fuck you", "and your", "mom"}
-end)
-
--- second page
-local theme = Window:addPage("Theme", 5012544693)
-local colors = theme:addSection("Colors")
-
-for theme, color in pairs(themes) do --all in one theme changer, i know, im cool
-   colors:addColorPicker(theme, color, function(color3)
-      Window:setTheme(theme, color3)
-   end)
-end
-Window:Notify("title", "msg")
--- load
-Window:SelectPage(Window.pages[1], true) -- no default for more freedom
-]]--
+Slider4:SetValue(0.5)
